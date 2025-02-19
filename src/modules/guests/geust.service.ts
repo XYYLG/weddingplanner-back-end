@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/core/database/prisma.service";
-import { CreateEditPetDto } from "./dto/create-edit-pet.dto";
+import { CreateEditGuestDto } from "./Dto/create-edit-guest.dto";
 
 @Injectable()
 export class GuestService {
@@ -11,49 +11,39 @@ export class GuestService {
         return await this.prisma.guests.findMany();
     }
 
-    public async getPetById(id: string) {
-        const pet = await this.prisma.pet.findUnique({
+    public async getGuestById(id: string) {
+        const guest = await this.prisma.guest.findUnique({
             where: { id },
         });
 
-        if (!pet) {
-            throw new NotFoundException('Pet not found'); // This returns a 404 error
+        if (!guest) {
+            throw new NotFoundException('Guest not found');
         }
 
-        return pet;
+        return guest;
     }
 
-    public async createPet(body: CreateEditPetDto) {
-        if (body.userId) {
-            const user = await this.prisma.user.findUnique({
-                where: { id: body.userId },
-            });
-
-            if (!user) {
-                throw new NotFoundException('User not found');
-            }
-        }
-
-        const newPet = await this.prisma.pet.create({
+    public async createGuest(body: CreateEditGuestDto) {
+        const newGuest = await this.prisma.guest.create({
             data: {
-                // This is a spreat operator that spreads the body object into the create object
+
                 ...body
             },
         });
 
-        return newPet;
+        return newGuest;
     }
 
-    public async updatePet(id: string, body: CreateEditPetDto) {
-        const petToUpdate = await this.prisma.pet.findUnique({
+    public async updateGuest(id: string, body: CreateEditGuestDto) {
+        const guestToUpdate = await this.prisma.guest.findUnique({
             where: { id },
         });
 
-        if (!petToUpdate) {
-            throw new NotFoundException('Pet not found');
+        if (!guestToUpdate) {
+            throw new NotFoundException('Guest not found');
         }
 
-        return await this.prisma.pet.update({
+        return await this.prisma.guest.update({
             where: { id },
             data: {
                 ...body
@@ -61,16 +51,16 @@ export class GuestService {
         });
     }
 
-    public async deletePet(id: string) {
-        const petToDelete = await this.prisma.pet.findUnique({
+    public async deleteGuest(id: string) {
+        const guestToDelete = await this.prisma.guest.findUnique({
             where: { id },
         });
 
-        if (!petToDelete) {
-            throw new NotFoundException('Pet not found');
+        if (!guestToDelete) {
+            throw new NotFoundException('Guest not found');
         }
 
-        return await this.prisma.pet.delete({
+        return await this.prisma.guest.delete({
             where: { id },
         });
     }

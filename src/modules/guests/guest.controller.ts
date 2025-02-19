@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { CreateEditPetDto } from "./dto/create-edit-guest.dto";
-import { PetService } from "./guest.service";
+import { GuestService } from "./geust.service";
+import { CreateEditGuestDto } from "./Dto/create-edit-guest.dto";
 
 @Controller('guest')
 export class GuestController {
@@ -9,26 +9,26 @@ export class GuestController {
 
   @Get()
   async getGuest() {
-    return this.guestService.getGuest();
+    return this.guestService.getGuests();
   }
 
   @Get(':id')
-  async getPetById(@Param('id') id: string) {
-    return this.petService.getPetById(id);
+  async getGuestById(@Param('id') id: string) {
+    return this.guestService.getGuestById(id);
   }
 
   @Post()
-  async createPet(@Body() pet: CreateEditPetDto) {
-    return this.petService.createPet(pet);
+  async createGuest(@Body() guest: CreateEditGuestDto) {
+    return this.guestService.createGuest(guest);
   }
 
   @Put(':id')
-  async updatePet(@Param('id') id: string, @Body() pet: CreateEditPetDto) {
-    return this.petService.updatePet(id, pet);
+  async updateGuest(@Param('id') id: string, @Body() guest: CreateEditGuestDto) {
+    return this.guestService.updateGuest(id, guest);
   }
 
   @Delete(':id')
-  async deletePet(@Param('id') id: string) {
-    return this.petService.deletePet(id);
+  async deleteGuest(@Param('id') id: string) {
+    return this.guestService.deleteGuest(id);
   }
 }
