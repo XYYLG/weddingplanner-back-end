@@ -34,7 +34,7 @@ export class CreateEditGuestDto {
     @Expose()
     @IsNotEmpty()
     @ApiProperty({
-        description: 'The addres of the guest is',
+        description: 'The address of the guest is',
         example: 'Niellerveld 43, 6042TB Roermond',
         type: String,
     })

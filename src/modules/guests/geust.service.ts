@@ -8,7 +8,7 @@ export class GuestService {
     constructor(private readonly prisma: PrismaService) { }
 
     public async getGuests() {
-        return await this.prisma.guests.findMany();
+        return await this.prisma.guest.findMany();
     }
 
     public async getGuestById(id: string) {
