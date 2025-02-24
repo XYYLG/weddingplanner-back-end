@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { GuestService } from "./geust.service";
+import { GuestService } from "./guest.service";
 import { CreateEditGuestDto } from "./Dto/create-edit-guest.dto";
 
 @Controller('guest')
