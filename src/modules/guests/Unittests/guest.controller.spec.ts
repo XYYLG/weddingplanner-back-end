@@ -68,10 +68,7 @@ describe('GuestController', () => {
     describe('createGuest', () => {
         it('should create and return a new guest', async () => {
             // Arrange
-            const createGuestDto: CreateEditGuestDto = {
-                firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890',
-                address: '123 Main St', postalCode: '12345', city: 'Anytown'
-            };
+            const createGuestDto: CreateEditGuestDto = { firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown' };
 
             const newGuest = {
                 ...createGuestDto,
@@ -95,13 +92,14 @@ describe('GuestController', () => {
             // Arrange
             const guestId = '1';
             const updateGuestDto: CreateEditGuestDto = { firstName: 'John2', lastName: 'Doe2', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown' };
+            const existingGuest = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown', createdAt: new Date(), updatedAt: new Date(), };
             const updatedGuest = {
-                id: guestId,
+                ...existingGuest,
                 ...updateGuestDto,
-                createdAt: new Date(),
                 updatedAt: new Date(),
             };
 
+            guestRepository.findById.mockResolvedValue(existingGuest);
             guestRepository.update.mockResolvedValue(updatedGuest);
 
             // Act
@@ -118,6 +116,7 @@ describe('GuestController', () => {
             const guestId = '1';
             const result = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown', createdAt: new Date(), updatedAt: new Date() };
 
+            guestRepository.findById.mockResolvedValue(result);
             guestRepository.delete.mockResolvedValue(result);
 
             // Act
@@ -127,4 +126,4 @@ describe('GuestController', () => {
             expect(deletedGuest).toEqual(result);
         });
     });
-});
+});    
