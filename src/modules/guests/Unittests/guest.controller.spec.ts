@@ -4,17 +4,17 @@ import { GuestController } from '../guest.controller';
 import { GuestRepository } from '../guest.repository';
 import { PrismaService } from '../../../core/database/prisma.service';
 import { CreateEditGuestDto } from '../Dto/create-edit-guest.dto';
-import { PrismaClient } from '@prisma/client';
+
+jest.mock('../guest.repository');
+jest.mock('../../../core/database/prisma.service');
 
 describe('GuestController', () => {
     let guestController: GuestController;
     let guestService: GuestService;
-    let guestRepository: GuestRepository;
-    let prisma: PrismaClient;
+    let guestRepository: jest.Mocked<GuestRepository>;
+    let prismaService: jest.Mocked<PrismaService>;
 
     beforeEach(async () => {
-        prisma = new PrismaClient();
-
         const module: TestingModule = await Test.createTestingModule({
             controllers: [GuestController],
             providers: [
@@ -26,14 +26,8 @@ describe('GuestController', () => {
 
         guestService = module.get<GuestService>(GuestService);
         guestController = module.get<GuestController>(GuestController);
-        guestRepository = module.get<GuestRepository>(GuestRepository);
-
-        // Clear the test database
-        await prisma.guest.deleteMany({});
-    });
-
-    afterAll(async () => {
-        await prisma.$disconnect();
+        guestRepository = module.get<GuestRepository>(GuestRepository) as jest.Mocked<GuestRepository>;
+        prismaService = module.get<PrismaService>(PrismaService) as jest.Mocked<PrismaService>;
     });
 
     describe('getGuest', () => {
@@ -45,7 +39,7 @@ describe('GuestController', () => {
                 { id: '3', firstName: 'Alice', lastName: 'Johnson', phoneNumber: '1122334455', address: '789 Oak St', postalCode: '11223', city: 'CityC', createdAt: new Date(), updatedAt: new Date() },
             ];
 
-            await prisma.guest.createMany({ data: result });
+            guestRepository.findAll.mockResolvedValue(result);
 
             // Act
             const guests = await guestController.getGuest();
@@ -60,7 +54,8 @@ describe('GuestController', () => {
             // Arrange
             const guestId = '1';
             const result = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'CityA', createdAt: new Date(), updatedAt: new Date() };
-            await prisma.guest.create({ data: result });
+
+            guestRepository.findById.mockResolvedValue(result);
 
             // Act
             const guest = await guestController.getGuestById(guestId);
@@ -78,48 +73,52 @@ describe('GuestController', () => {
                 address: '123 Main St', postalCode: '12345', city: 'Anytown'
             };
 
+            const newGuest = {
+                ...createGuestDto,
+                id: '1',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+
+            guestRepository.create.mockResolvedValue(newGuest);
+
             // Act
-            const newGuest = await guestController.createGuest(createGuestDto);
+            const result = await guestController.createGuest(createGuestDto);
 
             // Assert
-            expect(newGuest).toMatchObject({ firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown' });
-            expect(newGuest).toHaveProperty('id'); // Check if 'id' property exists
-            expect(newGuest).toHaveProperty('createdAt');
-            expect(newGuest).toHaveProperty('updatedAt');
+            expect(result).toEqual(newGuest);
         });
     });
-
 
     describe('updateGuest', () => {
         it('should update and return the updated guest', async () => {
             // Arrange
             const guestId = '1';
             const updateGuestDto: CreateEditGuestDto = { firstName: 'John2', lastName: 'Doe2', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown' };
-            const initialData = {
-                id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown', createdAt: new Date(), updatedAt: new Date(),
-            };
-            await prisma.guest.create({ data: initialData });
-
-            // Act
-            const updatedGuest = await guestController.updateGuest(guestId, updateGuestDto);
-
-            // Assert
-            expect(updatedGuest).toMatchObject({
+            const updatedGuest = {
                 id: guestId,
                 ...updateGuestDto,
-                createdAt: initialData.createdAt, // Ensure createdAt is the same
-            });
-            expect(updatedGuest).toHaveProperty('updatedAt'); // Check if updatedAt property exists
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+
+            guestRepository.update.mockResolvedValue(updatedGuest);
+
+            // Act
+            const result = await guestController.updateGuest(guestId, updateGuestDto);
+
+            // Assert
+            expect(result).toEqual(updatedGuest);
         });
     });
-
 
     describe('deleteGuest', () => {
         it('should delete and return the deleted guest', async () => {
             // Arrange
             const guestId = '1';
-            const result = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown', createdAt: new Date(), updatedAt: new Date(), };
-            await prisma.guest.create({ data: result });
+            const result = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown', createdAt: new Date(), updatedAt: new Date() };
+
+            guestRepository.delete.mockResolvedValue(result);
 
             // Act
             const deletedGuest = await guestController.deleteGuest(guestId);
