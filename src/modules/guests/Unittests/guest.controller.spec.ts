@@ -4,13 +4,13 @@ import { GuestController } from '../guest.controller';
 import { GuestRepository } from '../guest.repository';
 import { PrismaService } from '../../../core/database/prisma.service';
 import { CreateEditGuestDto } from '../Dto/create-edit-guest.dto';
+import { NotFoundException } from '@nestjs/common';
 
 jest.mock('../guest.repository');
 jest.mock('../../../core/database/prisma.service');
 
 describe('GuestController', () => {
     let guestController: GuestController;
-    let guestService: GuestService;
     let guestRepository: jest.Mocked<GuestRepository>;
     let prismaService: jest.Mocked<PrismaService>;
 
@@ -24,15 +24,17 @@ describe('GuestController', () => {
             ],
         }).compile();
 
-        guestService = module.get<GuestService>(GuestService);
         guestController = module.get<GuestController>(GuestController);
         guestRepository = module.get<GuestRepository>(GuestRepository) as jest.Mocked<GuestRepository>;
         prismaService = module.get<PrismaService>(PrismaService) as jest.Mocked<PrismaService>;
     });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
     describe('getGuest', () => {
         it('should return an array of guests', async () => {
-            // Arrange
             const result = [
                 { id: '1', firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'CityA', createdAt: new Date(), updatedAt: new Date() },
                 { id: '2', firstName: 'Jane', lastName: 'Smith', phoneNumber: '0987654321', address: '456 Elm St', postalCode: '67890', city: 'CityB', createdAt: new Date(), updatedAt: new Date() },
@@ -40,34 +42,36 @@ describe('GuestController', () => {
             ];
 
             guestRepository.findAll.mockResolvedValue(result);
-
-            // Act
             const guests = await guestController.getGuest();
-
-            // Assert
             expect(guests).toEqual(result);
+        });
+
+        it('should return an empty array if no guests are found', async () => {
+            guestRepository.findAll.mockResolvedValue([]);
+            const guests = await guestController.getGuest();
+            expect(guests).toEqual([]);
         });
     });
 
     describe('getGuestById', () => {
         it('should return a guest by ID', async () => {
-            // Arrange
             const guestId = '1';
             const result = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'CityA', createdAt: new Date(), updatedAt: new Date() };
 
             guestRepository.findById.mockResolvedValue(result);
-
-            // Act
             const guest = await guestController.getGuestById(guestId);
-
-            // Assert
             expect(guest).toEqual(result);
+        });
+
+        it('should throw NotFoundException if guest is not found', async () => {
+            const guestId = '1';
+            guestRepository.findById.mockResolvedValue(null);
+            await expect(guestController.getGuestById(guestId)).rejects.toThrow(NotFoundException);
         });
     });
 
     describe('createGuest', () => {
         it('should create and return a new guest', async () => {
-            // Arrange
             const createGuestDto: CreateEditGuestDto = { firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown' };
 
             const newGuest = {
@@ -78,21 +82,16 @@ describe('GuestController', () => {
             };
 
             guestRepository.create.mockResolvedValue(newGuest);
-
-            // Act
             const result = await guestController.createGuest(createGuestDto);
-
-            // Assert
             expect(result).toEqual(newGuest);
         });
     });
 
     describe('updateGuest', () => {
         it('should update and return the updated guest', async () => {
-            // Arrange
             const guestId = '1';
             const updateGuestDto: CreateEditGuestDto = { firstName: 'John2', lastName: 'Doe2', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown' };
-            const existingGuest = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown', createdAt: new Date(), updatedAt: new Date(), };
+            const existingGuest = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown', createdAt: new Date(), updatedAt: new Date() };
             const updatedGuest = {
                 ...existingGuest,
                 ...updateGuestDto,
@@ -101,29 +100,33 @@ describe('GuestController', () => {
 
             guestRepository.findById.mockResolvedValue(existingGuest);
             guestRepository.update.mockResolvedValue(updatedGuest);
-
-            // Act
             const result = await guestController.updateGuest(guestId, updateGuestDto);
-
-            // Assert
             expect(result).toEqual(updatedGuest);
+        });
+
+        it('should throw NotFoundException if guest to update is not found', async () => {
+            const guestId = '1';
+            const updateGuestDto: CreateEditGuestDto = { firstName: 'John2', lastName: 'Doe2', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown' };
+            guestRepository.findById.mockResolvedValue(null);
+            await expect(guestController.updateGuest(guestId, updateGuestDto)).rejects.toThrow(NotFoundException);
         });
     });
 
     describe('deleteGuest', () => {
         it('should delete and return the deleted guest', async () => {
-            // Arrange
             const guestId = '1';
             const result = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown', createdAt: new Date(), updatedAt: new Date() };
 
             guestRepository.findById.mockResolvedValue(result);
             guestRepository.delete.mockResolvedValue(result);
-
-            // Act
             const deletedGuest = await guestController.deleteGuest(guestId);
-
-            // Assert
             expect(deletedGuest).toEqual(result);
         });
+
+        it('should throw NotFoundException if guest to delete is not found', async () => {
+            const guestId = '1';
+            guestRepository.findById.mockResolvedValue(null);
+            await expect(guestController.deleteGuest(guestId)).rejects.toThrow(NotFoundException);
+        });
     });
-});    
+});
