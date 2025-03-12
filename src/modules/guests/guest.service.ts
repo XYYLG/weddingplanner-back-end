@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { GuestRepository } from "./guest.repository";
 import { CreateEditGuestDto } from "./Dto/create-edit-guest.dto";
+import { Guest } from "@prisma/client";
 
 @Injectable()
 export class GuestService {
@@ -45,4 +46,18 @@ export class GuestService {
 
         return await this.guestRepository.delete(String(id));
     }
+
+    public async fetchGuests(): Promise<Guest[]> {
+        try {
+            const response = await fetch('http://localhost:3000/api/guests', { mode: 'cors' });
+            if (!response.ok) {
+                throw new Error("Fout bij het ophalen van gasten");
+            }
+            return await response.json();
+        } catch (error) {
+            console.error("API fout:", error);
+            return [];
+        }
+    }
+
 }
