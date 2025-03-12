@@ -8,8 +8,12 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  // CORS inschakelen
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    methods: 'GET,POST,PUT,DELETE',
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Cats example')
     .setDescription('The cats API description')
