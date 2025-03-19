@@ -63,15 +63,4 @@ export class CreateEditGuestDto {
         type: String,
     })
     city: string;
-
-    @Expose()
-    @IsOptional()
-    @IsString()
-    @ApiProperty({
-        description: 'An optional field for additional information',
-        example: 'Additional information',
-        type: String,
-        required: false
-    })
-    additionalInfo?: string;
 }
