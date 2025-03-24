@@ -16,13 +16,13 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18.x' # Stel de gewenste versie van Node.js in
+        node-version: '18.x' 
 
     - name: Install dependencies
       run: npm install
 
     - name: Build
-      run: npm run build # Zorg ervoor dat je een build script hebt in je package.json
+      run: npm run build 
 
     - name: Run tests
-      run: npm test # Zorg ervoor dat je een test script hebt in je package.json
+      run: npm test 
