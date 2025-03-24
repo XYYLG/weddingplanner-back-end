@@ -1,0 +1,28 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x' # Stel de gewenste versie van Node.js in
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build
+      run: npm run build # Zorg ervoor dat je een build script hebt in je package.json
+
+    - name: Run tests
+      run: npm test # Zorg ervoor dat je een test script hebt in je package.json
