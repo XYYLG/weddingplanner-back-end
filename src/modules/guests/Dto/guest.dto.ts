@@ -43,24 +43,6 @@ export class CreateEditGuestDto {
     @Expose()
     @IsNotEmpty()
     @ApiProperty({
-        description: 'The postalcode of the guest is',
-        example: '6042TB',
-        type: String,
-    })
-    postalCode: string;
-
-    @Expose()
-    @IsNotEmpty()
-    @ApiProperty({
-        description: 'The city of the guest is',
-        example: 'Roermond',
-        type: String,
-    })
-    city: string;
-
-    @Expose()
-    @IsNotEmpty()
-    @ApiProperty({
         description: 'created at guest',
         example: '2025-14-02',
         type: Date,

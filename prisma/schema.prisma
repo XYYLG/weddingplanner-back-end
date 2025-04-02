@@ -13,8 +13,6 @@ model Guest {
     lastName    String
     phoneNumber String
     address     String
-    postalCode  String
-    city        String
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 }
