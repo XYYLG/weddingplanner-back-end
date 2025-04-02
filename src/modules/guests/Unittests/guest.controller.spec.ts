@@ -36,9 +36,9 @@ describe('GuestController', () => {
     describe('getGuest', () => {
         it('should return an array of guests', async () => {
             const result = [
-                { id: '1', firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'CityA', createdAt: new Date(), updatedAt: new Date() },
-                { id: '2', firstName: 'Jane', lastName: 'Smith', phoneNumber: '0987654321', address: '456 Elm St', postalCode: '67890', city: 'CityB', createdAt: new Date(), updatedAt: new Date() },
-                { id: '3', firstName: 'Alice', lastName: 'Johnson', phoneNumber: '1122334455', address: '789 Oak St', postalCode: '11223', city: 'CityC', createdAt: new Date(), updatedAt: new Date() },
+                { id: '1', firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', createdAt: new Date(), updatedAt: new Date() },
+                { id: '2', firstName: 'Jane', lastName: 'Smith', phoneNumber: '0987654321', address: '456 Elm St', createdAt: new Date(), updatedAt: new Date() },
+                { id: '3', firstName: 'Alice', lastName: 'Johnson', phoneNumber: '1122334455', address: '789 Oak St', createdAt: new Date(), updatedAt: new Date() },
             ];
 
             guestRepository.findAll.mockResolvedValue(result);
@@ -56,7 +56,7 @@ describe('GuestController', () => {
     describe('getGuestById', () => {
         it('should return a guest by ID', async () => {
             const guestId = '1';
-            const result = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'CityA', createdAt: new Date(), updatedAt: new Date() };
+            const result = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', createdAt: new Date(), updatedAt: new Date() };
 
             guestRepository.findById.mockResolvedValue(result);
             const guest = await guestController.getGuestById(guestId);
@@ -72,7 +72,7 @@ describe('GuestController', () => {
 
     describe('createGuest', () => {
         it('should create and return a new guest', async () => {
-            const createGuestDto: CreateEditGuestDto = { firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown' };
+            const createGuestDto: CreateEditGuestDto = { firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St' };
 
             const newGuest = {
                 ...createGuestDto,
@@ -90,8 +90,8 @@ describe('GuestController', () => {
     describe('updateGuest', () => {
         it('should update and return the updated guest', async () => {
             const guestId = '1';
-            const updateGuestDto: CreateEditGuestDto = { firstName: 'John2', lastName: 'Doe2', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown' };
-            const existingGuest = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown', createdAt: new Date(), updatedAt: new Date() };
+            const updateGuestDto: CreateEditGuestDto = { firstName: 'John2', lastName: 'Doe2', phoneNumber: '1234567890', address: '123 Main St' };
+            const existingGuest = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', createdAt: new Date(), updatedAt: new Date() };
             const updatedGuest = {
                 ...existingGuest,
                 ...updateGuestDto,
@@ -106,7 +106,7 @@ describe('GuestController', () => {
 
         it('should throw NotFoundException if guest to update is not found', async () => {
             const guestId = '1';
-            const updateGuestDto: CreateEditGuestDto = { firstName: 'John2', lastName: 'Doe2', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown' };
+            const updateGuestDto: CreateEditGuestDto = { firstName: 'John2', lastName: 'Doe2', phoneNumber: '1234567890', address: '123 Main St' };
             guestRepository.findById.mockResolvedValue(null);
             await expect(guestController.updateGuest(guestId, updateGuestDto)).rejects.toThrow(NotFoundException);
         });
@@ -115,7 +115,7 @@ describe('GuestController', () => {
     describe('deleteGuest', () => {
         it('should delete and return the deleted guest', async () => {
             const guestId = '1';
-            const result = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', postalCode: '12345', city: 'Anytown', createdAt: new Date(), updatedAt: new Date() };
+            const result = { id: guestId, firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', createdAt: new Date(), updatedAt: new Date() };
 
             guestRepository.findById.mockResolvedValue(result);
             guestRepository.delete.mockResolvedValue(result);
