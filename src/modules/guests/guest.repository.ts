@@ -7,8 +7,13 @@ export class GuestRepository {
     constructor(private prisma: PrismaService) { }
 
     async findAll(): Promise<Guest[]> {
-        return this.prisma.guest.findMany();
+        return this.prisma.guest.findMany({
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
     }
+
 
     async findById(id: string): Promise<Guest | null> {
         return this.prisma.guest.findUnique({

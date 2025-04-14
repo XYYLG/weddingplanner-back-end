@@ -29,7 +29,7 @@ export class CreateEditGuestDto {
     @Matches(/^\+?\d{10,15}$/, { message: 'Phone number must be a valid international number' })
     @ApiProperty({
         description: 'The phone number of the guest is',
-        example: '+316123456',
+        example: '+31612345678',
         type: String,
     })
     phoneNumber: string;
