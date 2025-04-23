@@ -7,6 +7,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . ./
+RUN npx prisma generate # Prisma Client generatie
 RUN npm run build
 
 # Production stage
