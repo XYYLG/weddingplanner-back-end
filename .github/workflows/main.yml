@@ -26,3 +26,10 @@ jobs:
 
     - name: Run tests
       run: npm test 
+
+      -- name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      with:
+        projectBaseDir: . # Map van het project (de root in dit geval)
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Geheim token voor authenticatie op SonarCloud
