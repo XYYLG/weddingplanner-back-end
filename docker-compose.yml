@@ -30,7 +30,7 @@ services:
       MYSQL_ROOT_PASSWORD: XPqZhkGAqUPBLVmiC46d
       MYSQL_DATABASE: weddingplanner-db
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
 
