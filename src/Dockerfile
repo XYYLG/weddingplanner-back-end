@@ -22,7 +22,8 @@ RUN npm ci --only=production
 
 COPY --from=build /app/dist ./dist
 
-# Expose the port your application runs on (bijvoorbeeld poort 3000)
+# Expose the port your application runs on
 EXPOSE 3000
 
+# Set the command to run your app using CMD which defines your runtime
 CMD ["node", "dist/index.js"]

@@ -1,0 +1,3 @@
+#do not copy unnecessary files into our production container
+node_modules
+dist/
