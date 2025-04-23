@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+
+  app:
+    build: .
+    container_name: my-ts-app
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+
+    depends_on:
+      - mysql
+
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=
+      - DB_NAME=weddingplanner-db@localhost
+      - DB_PORT=3306
+      - DATABASE_URL=mysql://root:XPqZhkGAqUPBLVmiC46d@localhost:3306/weddingplanner-db
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment: MYSQL_ROOT_PASSWORD= MYSQL_DATABASE=weddingplanner-db@localhost
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
