@@ -26,9 +26,3 @@ jobs:
     - name: Run tests
       run: npm test 
 
-    - name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@master 
-      with:
-        projectBaseDir: . # De projectmap (root van je repository)
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
