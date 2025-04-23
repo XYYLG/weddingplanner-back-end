@@ -11,15 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4 # Haalt de repository op
     
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18.x' 
-
     - name: Install dependencies
-      run: npm install
+      run: npm install 
 
     - name: Build
       run: npm run build 
@@ -27,9 +26,9 @@ jobs:
     - name: Run tests
       run: npm test 
 
-      -- name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@master
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master 
       with:
-        projectBaseDir: . # Map van het project (de root in dit geval)
+        projectBaseDir: . # De projectmap (root van je repository)
       env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Geheim token voor authenticatie op SonarCloud
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
