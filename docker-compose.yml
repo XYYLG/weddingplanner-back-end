@@ -1,7 +1,6 @@
 version: "3.9"
 
 services:
-
   app:
     build: .
     container_name: weddingplanner-app
@@ -11,7 +10,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    command: npm run dev
+    command: npm run start:dev
     depends_on:
       - mysql
     environment:
@@ -33,6 +32,14 @@ services:
       - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 # Correcte plaatsing van 'command'
+    restart: always
 
 volumes:
   mysql-data:
