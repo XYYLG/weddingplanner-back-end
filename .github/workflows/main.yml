@@ -28,7 +28,7 @@ jobs:
       run: npm test -- --coverage
 
     - name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@master 
+      uses: sonarsource/sonarcloud-scan-action@v1
       with:
         projectBaseDir: . # De projectmap (root van je repository)
       env:
