@@ -28,12 +28,11 @@ jobs:
       run: npm test -- --coverage
 
     - name: SonarCloud Scan
-      uses: sonarcloud-scan-action@v1
-      with:
-        projectBaseDir: . # De projectmap (root van je repository)
+      uses: sonarsource/sonarcloud-github-action@master
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    
+      with:
+        projectBaseDir: . # De projectmap (root van je repository)
 
   docker-deploy:
     needs: test
