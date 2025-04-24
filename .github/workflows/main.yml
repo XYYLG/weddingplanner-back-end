@@ -27,21 +27,22 @@ jobs:
     - name: Run tests and generate coverage
       run: npm test -- --coverage
 
-    -  name: SonarCloud Scan
-       uses: sonarsource/sonarcloud-github-action@master
-       env:
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-       with:
-        args: "-Dsonar.projectKey=XYYLG_weddingplanner-back-end -Dsonar.organization=xyylg -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
-
+      with:
+        args: >
+          -Dsonar.projectKey=XYYLG_weddingplanner-back-end
+          -Dsonar.organization=xyylg
+          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
 
   docker-deploy:
     needs: test
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
