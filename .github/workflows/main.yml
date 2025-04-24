@@ -31,11 +31,13 @@ jobs:
       uses: sonarsource/sonarqube-scan-action@v1
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: https://sonarcloud.io
       with:
         args: >
           -Dsonar.projectKey=XYYLG_weddingplanner-back-end
           -Dsonar.organization=xyylg
           -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+    
 
   docker-deploy:
     needs: test
