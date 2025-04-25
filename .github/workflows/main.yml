@@ -1,51 +1,81 @@
 name: CI/CD Pipeline
-
+ 
 on:
+
   push:
+
     branches: [ master ]
 
+  pull_request:
+
+    branches: [ master ]
+ 
 jobs:
+
   test:
+
     runs-on: ubuntu-latest
-
+ 
     steps:
-    - uses: actions/checkout@v4
 
+    - name: Checkout code
+
+      uses: actions/checkout@v4
+ 
     - name: Setup Node.js
+
       uses: actions/setup-node@v3
+
       with:
+
         node-version: '18.x'
-
+ 
     - name: Install dependencies
+
       run: npm install
+ 
+    - name: Build project
 
-    - name: Build
       run: npm run build
-
+ 
     - name: Run tests and generate coverage
+
       run: npm test -- --coverage
+ 
+    - name: Install SonarScanner globally
 
-    - name: SonarCloud Scan
-      if: github.event_name == 'push'
-      uses: sonarsource/sonarcloud-github-action@v2.0.2
+      run: npm install -g sonar-scanner
+ 
+    - name: Run SonarCloud Analysis
+
       env:
+
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_SCANNER_OPTS: "-Dsonar.scanner.force-deprecated-github-action=true"
-      with:
-        projectBaseDir: . # Path to your project directory
 
+      run: sonar-scanner
+ 
   docker-deploy:
+
     needs: test
+
     runs-on: ubuntu-latest
-
+ 
     steps:
-    - uses: actions/checkout@v4
 
+    - name: Checkout code
+
+      uses: actions/checkout@v4
+ 
     - name: Log in to Docker Hub
+
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
+ 
     - name: Build Docker image
-      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/weddingplanner-back-end:latest .
 
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/weddingplanner-back-end:latest .
+ 
     - name: Push Docker image
+
       run: docker push ${{ secrets.DOCKER_USERNAME }}/weddingplanner-back-end:latest
+
+ 
