@@ -28,7 +28,7 @@ jobs:
 
       # Voer tests uit
       - name: Run tests
-        run: npm run test -- --watchAll=false --ci --reporters=default jest-junit --coverage --coverageReporters=lcov
+        run: npm test
 
       #  Upload testresultaten als artifact
       - name: Upload Test Results
