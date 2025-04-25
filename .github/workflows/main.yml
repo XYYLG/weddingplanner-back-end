@@ -53,7 +53,8 @@ jobs:
                 -Dsonar.tests=src/modules/guests/Unittests \
                 -Dsonar.test.inclusions=src/modules/guests/Unittests/**/*.spec.ts \
                 -Dsonar.exclusions=src/modules/guests/**/*.spec.ts \
-                -Dsonar.typescript.lcov.reportPaths=coverage/lcov-report/index-lcov-report.json
+                --Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
+
     
 
       # Build de applicatie
