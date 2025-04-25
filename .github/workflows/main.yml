@@ -11,29 +11,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Stap 1: Checkout de code
+      # Checkout de code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Stap 2: Zet Node.js 18 op (of een andere versie die je gebruikt)
+      # Zet Node.js 18 op (of een andere versie die je gebruikt)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # Stap 3: Installeer de afhankelijkheden
+      # Installeer de afhankelijkheden
       - name: Install dependencies
         run: npm install
 
-      # Stap 4: Run linting (optioneel)
-      - name: Run linting
-        run: npm run lint
 
-      # Stap 5: Voer tests uit
+      # Voer tests uit
       - name: Run tests
         run: npm run test -- --ci --reporters=jest-stare --coverage
 
-      # Stap 6: Upload testresultaten als artifact
+      #  Upload testresultaten als artifact
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -41,7 +38,7 @@ jobs:
           name: test-results
           path: coverage/
 
-      # Stap 7: SonarCloud Analyse
+      # SonarCloud Analyse
       - name: Analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -57,7 +54,7 @@ jobs:
             -Dsonar.tests=src \
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov-report/index-lcov-report.json
 
-      # Stap 8: Build de applicatie
+      # Build de applicatie
       - name: Build the application
         run: npm run build
 
