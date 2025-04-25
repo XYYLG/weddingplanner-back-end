@@ -1,56 +1,55 @@
 name: CI/CD Pipeline
-
+ 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-    branches:
-      - master
-
+    branches: [ master ]
+ 
 jobs:
   test:
     runs-on: ubuntu-latest
-
+ 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4  
+ 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-
+ 
       - name: Install dependencies
         run: npm install
-
-      - name: Build application
+ 
+      - name: Build (TypeScript)
         run: npm run build
-
+ 
       - name: Run tests
         run: npm test
-
-      - name: SonarCloud Analysis
-        uses: sonarsource/sonarcloud-github-action@v1
+ 
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v1
         with:
-          entryPoint: 'sonar-scanner'
-          args: '-Dsonar.organization=xyylg -Dsonar.projectKey=XYYLG_weddingplanner-back-end -Dsonar.host.url=https://sonarcloud.io'
+          organization: 'xyylg' 
+          projectKey: 'XYYLG_weddingplanner-back-end'  
+          args: >
+            -Dsonar.typescript.lcov.reportPaths=coverage/lcov-report/index-lcov-report.json
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+ 
   docker-deploy:
-    needs: test
+    needs: test 
     runs-on: ubuntu-latest
-
+ 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-
+        uses: actions/checkout@v4  
+ 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
+ 
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/weddingplanner-back-end:latest .
-
+ 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/weddingplanner-back-end:latest
