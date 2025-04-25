@@ -7,56 +7,77 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # Stap 1: Checkout de code
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      # Stap 2: Zet Node.js 18 op (of een andere versie die je gebruikt)
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: '18'
 
+      # Stap 3: Installeer de afhankelijkheden
       - name: Install dependencies
         run: npm install
 
-      - name: Build (TypeScript)
-        run: npm run build
+      # Stap 4: Run linting (optioneel)
+      - name: Run linting
+        run: npm run lint
 
+      # Stap 5: Voer tests uit
       - name: Run tests
-        run: npm test
+        run: npm run test -- --ci --reporters=jest-stare --coverage
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
+      # Stap 6: Upload testresultaten als artifact
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          name: test-results
+          path: coverage/
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v1
-        with:
-          entryPoint: 'sonar-scanner'
-          args: >
-            -Dsonar.organization=xyylg
-            -Dsonar.projectKey=XYYLG_weddingplanner-back-end
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.typescript.lcov.reportPaths=coverage/lcov-report/index-lcov-report.json
+      # Stap 7: SonarCloud Analyse
+      - name: Analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          # Installeer de SonarScanner tool
+          npm install sonar-scanner --save-dev
+          ./node_modules/.bin/sonar-scanner \
+            -Dsonar.projectKey=XYYLG_weddingplanner-back-end \
+            -Dsonar.organization=xyylg \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.sources=src \
+            -Dsonar.tests=src \
+            -Dsonar.typescript.lcov.reportPaths=coverage/lcov-report/index-lcov-report.json
+
+      # Stap 8: Build de applicatie
+      - name: Build the application
+        run: npm run build
 
   docker-deploy:
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # Stap 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
+      # Stap 2: Log in bij DockerHub
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+      # Stap 3: Bouw Docker image
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/weddingplanner-back-end:latest .
 
+      # Stap 4: Push Docker image
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/weddingplanner-back-end:latest
