@@ -39,7 +39,7 @@ jobs:
           path: coverage/lcov-report/lcov.info
 
       - name: Debug Coverage Directory
-        run: ls -la coverage/
+        run: ls -la
 
             # SonarCloud Analyse
       - name: Analyze with SonarCloud
