@@ -27,8 +27,8 @@ jobs:
 
 
       # Voer tests uit
-      - name: Run tests
-        run: npm test
+      - name: Run tests with coverage
+        run: npx jest --coverage
 
       #  Upload testresultaten als artifact
       - name: Upload Test Results
