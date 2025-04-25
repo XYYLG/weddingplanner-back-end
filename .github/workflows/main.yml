@@ -26,11 +26,13 @@ jobs:
       run: npm test -- --coverage
 
     - name: SonarCloud Scan
+      if: github.event_name == 'push'
       uses: sonarsource/sonarcloud-github-action@v2.0.2
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_SCANNER_OPTS: "-Dsonar.scanner.force-deprecated-github-action=true"
       with:
-        projectBaseDir: . # De projectmap (root van je repository)
+        projectBaseDir: . # Path to your project directory
 
   docker-deploy:
     needs: test
