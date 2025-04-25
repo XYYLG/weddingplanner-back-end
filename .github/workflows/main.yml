@@ -29,13 +29,12 @@ jobs:
       - name: Install SonarScanner globally
         run: npm install -g sonar-scanner
  
-      - name: Run SonarCloud Analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Zorg ervoor dat je SONAR_TOKEN hebt toegevoegd aan GitHub Secrets
-        run: sonar-scanner \
-          -Dsonar.organization=xyylg \
-          -Dsonar.projectKey=XYYLG_weddingplanner-back-end \
-          -Dsonar.host.url=https://sonarcloud.io 
+      - name: Set up SonarCloud
+        uses: SonarSource/sonarcloud-github-action@v1
+        with:
+          organization: 'xyylg'
+          projectKey: 'XYYLG_weddingplanner-back-end'
+          token: ${{ secrets.SONAR_TOKEN }}
  
   docker-deploy:
     needs: test  # Zorg ervoor dat de deploy pas wordt uitgevoerd na de test
