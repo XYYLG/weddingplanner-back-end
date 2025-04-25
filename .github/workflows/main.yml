@@ -51,7 +51,7 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.sources=src \
-            -Dsonar.tests=src \
+            -Dsonar.tests=src\modules\guests\Unittests \
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov-report/index-lcov-report.json
 
       # Build de applicatie
