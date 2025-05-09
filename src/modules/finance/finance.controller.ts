@@ -3,7 +3,7 @@ import { FinanceService } from "./finance.service";
 import { CreateEditFinanceDto } from "./Dto/create-edit-finance.dto";
 
 
-@Controller('guest')
+@Controller('finance')
 export class FinanceController {
     constructor(private readonly financeService: FinanceService) { }
 

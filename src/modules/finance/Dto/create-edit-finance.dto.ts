@@ -1,13 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude, Expose } from "class-transformer";
-import { IsNotEmpty, IsString, Matches, IsOptional } from "class-validator";
+import { IsNotEmpty, IsString, Matches, IsOptional, IsNumber } from "class-validator";
 
 @Exclude()
 export class CreateEditFinanceDto {
 
     @Expose()
     @IsNotEmpty()
-    @IsString()
+    @IsNumber()
     @ApiProperty({
         description: 'The amount already payed of the finance is',
         example: '1000',
@@ -17,7 +17,7 @@ export class CreateEditFinanceDto {
 
     @Expose()
     @IsNotEmpty()
-    @IsString()
+    @IsNumber()
     @ApiProperty({
         description: 'The amount to be payed',
         example: '1000',
@@ -27,7 +27,7 @@ export class CreateEditFinanceDto {
 
     @Expose()
     @IsNotEmpty()
-    @IsString()
+    @IsNumber()
     @ApiProperty({
         description: 'The total amount to be payed',
         example: '1000',

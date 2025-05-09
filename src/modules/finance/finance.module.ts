@@ -8,4 +8,4 @@ import { FinanceRepository } from "./finance.repository";
     controllers: [FinanceController],
     providers: [FinanceService, FinanceRepository, PrismaService],
 })
-export class FinanceModel { }
+export class FinanceModule { }
