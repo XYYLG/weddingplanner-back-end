@@ -14,15 +14,14 @@ export class FinanceRepository {
         });
     }
 
-
-    async findById(id: string): Promise<Guest | null> {
-        return this.prisma.guest.findUnique({
+    async findById(id: string): Promise<Finance | null> {
+        return this.prisma.finance.findUnique({
             where: { id },
         });
     }
 
-    async create(data: Omit<Guest, 'id' | 'createdAt' | 'updatedAt'>): Promise<Guest> {
-        return this.prisma.guest.create({
+    async create(data: Omit<Finance, 'id' | 'createdAt' | 'updatedAt'>): Promise<Finance> {
+        return this.prisma.finance.create({
             data,
         });
     }

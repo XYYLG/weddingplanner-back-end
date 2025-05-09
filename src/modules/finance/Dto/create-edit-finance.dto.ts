@@ -1,5 +1,4 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Decimal } from "@prisma/client/runtime/library";
 import { Exclude, Expose } from "class-transformer";
 import { IsNotEmpty, IsString, Matches, IsOptional } from "class-validator";
 
@@ -20,7 +19,7 @@ export class CreateEditFinanceDto {
     @IsNotEmpty()
     @IsString()
     @ApiProperty({
-        description: 'The amount to be payed of the finance is',
+        description: 'The amount to be payed',
         example: '1000',
         type: Number,
     })
@@ -30,7 +29,7 @@ export class CreateEditFinanceDto {
     @IsNotEmpty()
     @IsString()
     @ApiProperty({
-        description: 'The amount to be payed of the finance is',
+        description: 'The total amount to be payed',
         example: '1000',
         type: Number,
     })

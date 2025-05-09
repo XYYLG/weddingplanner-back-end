@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { FinanceService } from "./finance.service";
+import { CreateEditFinanceDto } from "./Dto/create-edit-finance.dto";
 
 
 @Controller('guest')
@@ -14,12 +15,12 @@ export class FinanceController {
 
     @Get(':id')
     async getGuestById(@Param('id') id: string) {
-        return this.guestService.getGuestById(id);
+        return this.financeService.getAmountById(id);
     }
 
     @Post()
-    async createGuest(@Body() guest: CreateEditGuestDto) {
-        return this.guestService.createGuest(guest);
+    async createAmount(@Body() amount: CreateEditFinanceDto) {
+        return this.financeService.createAmount(amount);
     }
 
     @Put(':id')

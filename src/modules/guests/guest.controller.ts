@@ -18,7 +18,7 @@ export class GuestController {
   }
 
   @Post()
-  async createGuest(@Body() guest: CreateEditGuestDto) {
+  async createAmount(@Body() guest: CreateEditGuestDto) {
     return this.guestService.createGuest(guest);
   }
 

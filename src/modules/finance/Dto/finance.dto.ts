@@ -4,13 +4,13 @@ import { Exclude, Expose } from "class-transformer";
 import { IsNotEmpty, IsString, Matches, IsOptional } from "class-validator";
 
 @Exclude()
-export class CreateEditFinanceDto {
+export class FinanceDto {
 
     @Expose()
     @IsNotEmpty()
     @IsString()
     @ApiProperty({
-        description: 'The amount already payed of the finance is',
+        description: 'The amount already payed',
         example: '1000',
         type: Number,
     })
@@ -20,7 +20,7 @@ export class CreateEditFinanceDto {
     @IsNotEmpty()
     @IsString()
     @ApiProperty({
-        description: 'The amount to be payed of the finance is',
+        description: 'The amount to be payed',
         example: '1000',
         type: Number,
     })
@@ -30,7 +30,7 @@ export class CreateEditFinanceDto {
     @IsNotEmpty()
     @IsString()
     @ApiProperty({
-        description: 'The amount to be payed ',
+        description: 'The total amount to be payed ',
         example: '1000',
         type: Number,
     })

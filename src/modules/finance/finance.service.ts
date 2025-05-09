@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { Guest } from "@prisma/client";
 import { FinanceRepository } from "./finance.repository";
+import { CreateEditFinanceDto } from "./Dto/finance.dto";
 
 @Injectable()
 export class FinanceService {
@@ -11,19 +12,19 @@ export class FinanceService {
         return await this.financeRepository.findAll();
     }
 
-    public async getGuestById(id: string) {
-        const guest = await this.guestRepository.findById(String(id));
+    public async getAmountById(id: string) {
+        const amount = await this.financeRepository.findById(String(id));
 
-        if (!guest) {
-            throw new NotFoundException('Guest not found');
+        if (!amount) {
+            throw new NotFoundException('Amount not found');
         }
 
-        return guest;
+        return amount;
     }
 
-    public async createGuest(body: CreateEditGuestDto) {
-        const newGuest = await this.guestRepository.create(body);
-        return newGuest;
+    public async createAmount(body: CreateEditFinanceDto) {
+        const newAmount = await this.financeRepository.create(body);
+        return newAmount;
     }
 
     public async updateGuest(id: string, body: CreateEditGuestDto) {
