@@ -13,13 +13,8 @@ services:
     command: npm run start:dev
     depends_on:
       - mysql
-    environment:
-      - DB_HOST=mysql
-      - DB_USER=root
-      - DB_PASSWORD=XPqZhkGAqUPBLVmiC46d
-      - DB_NAME=weddingplanner-db
-      - DB_PORT=3306
-      - DATABASE_URL=mysql://root:XPqZhkGAqUPBLVmiC46d@localhost:3306/weddingplanner-db
+    env_file:
+      - .env.docker
 
   mysql:
     image: mysql:8.0
@@ -38,7 +33,7 @@ services:
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 30 # Correcte plaatsing van 'command'
+    command: --interval 30
     restart: always
 
 volumes:
