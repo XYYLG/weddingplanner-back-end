@@ -24,12 +24,12 @@ export class FinanceController {
     }
 
     @Put(':id')
-    async updateGuest(@Param('id') id: string, @Body() guest: CreateEditGuestDto) {
-        return this.guestService.updateGuest(id, guest);
+    async updateAmount(@Param('id') id: string, @Body() amount: CreateEditFinanceDto) {
+        return this.financeService.updateAmount(id, amount);
     }
 
     @Delete(':id')
     async deleteGuest(@Param('id') id: string) {
-        return this.guestService.deleteGuest(id);
+        return this.financeService.deleteAmount(id);
     }
 }

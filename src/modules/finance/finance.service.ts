@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Guest } from "@prisma/client";
+import { Finance, Guest } from "@prisma/client";
+import { CreateEditFinanceDto } from "./Dto/create-edit-finance.dto";
 import { FinanceRepository } from "./finance.repository";
-import { CreateEditFinanceDto } from "./Dto/finance.dto";
 
 @Injectable()
 export class FinanceService {
@@ -27,31 +27,31 @@ export class FinanceService {
         return newAmount;
     }
 
-    public async updateGuest(id: string, body: CreateEditGuestDto) {
-        const guestToUpdate = await this.guestRepository.findById(String(id));
+    public async updateAmount(id: string, body: CreateEditFinanceDto) {
+        const amountToUpdate = await this.financeRepository.findById(String(id));
 
-        if (!guestToUpdate) {
-            throw new NotFoundException('Guest not found');
+        if (!amountToUpdate) {
+            throw new NotFoundException('Amount not found');
         }
 
-        return await this.guestRepository.update(String(id), body);
+        return await this.financeRepository.update(String(id), body);
     }
 
-    public async deleteGuest(id: string) {
-        const guestToDelete = await this.guestRepository.findById(String(id));
+    public async deleteAmount(id: string) {
+        const amountToDelete = await this.financeRepository.findById(String(id));
 
-        if (!guestToDelete) {
-            throw new NotFoundException('Guest not found');
+        if (!amountToDelete) {
+            throw new NotFoundException('Amount not found');
         }
 
-        return await this.guestRepository.delete(String(id));
+        return await this.financeRepository.delete(String(id));
     }
 
-    public async fetchGuests(): Promise<Guest[]> {
+    public async fetchAmounts(): Promise<Finance[]> {
         try {
-            const response = await fetch('http://localhost:8080/api/guests', { mode: 'cors' });
+            const response = await fetch('http://localhost:8080/api/finance', { mode: 'cors' });
             if (!response.ok) {
-                throw new Error("Fout bij het ophalen van gasten");
+                throw new Error("Fout bij het ophalen van bedragen");
             }
             return await response.json();
         } catch (error) {

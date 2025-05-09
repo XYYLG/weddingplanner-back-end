@@ -26,15 +26,15 @@ export class FinanceRepository {
         });
     }
 
-    async update(id: string, data: Partial<Guest>): Promise<Guest> {
-        return this.prisma.guest.update({
+    async update(id: string, data: Partial<Finance>): Promise<Finance> {
+        return this.prisma.finance.update({
             where: { id },
             data,
         });
     }
 
-    async delete(id: string): Promise<Guest> {
-        return this.prisma.guest.delete({
+    async delete(id: string): Promise<Finance> {
+        return this.prisma.finance.delete({
             where: { id },
         });
     }

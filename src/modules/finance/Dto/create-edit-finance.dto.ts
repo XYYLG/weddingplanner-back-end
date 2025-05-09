@@ -33,7 +33,7 @@ export class CreateEditFinanceDto {
         example: '1000',
         type: Number,
     })
-    totalAmount: number;
+    amountTotal: number;
 
     @Expose()
     @IsNotEmpty()
