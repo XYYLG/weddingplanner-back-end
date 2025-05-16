@@ -21,8 +21,9 @@ services:
     container_name: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: XPqZhkGAqUPBLVmiC46d
-      MYSQL_DATABASE: weddingplanner-db
+    MYSQL__ROOT_USER: root
+    MYSQL_ROOT_PASSWORD: XPqZhkGAqUPBLVmiC46d
+    MYSQL_DATABASE: weddingplanner-db
     ports:
       - "3307:3306"
     volumes:
