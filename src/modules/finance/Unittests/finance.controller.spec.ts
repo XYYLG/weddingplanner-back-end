@@ -136,14 +136,14 @@ describe('FinanceController', () => {
             };
 
             financeService.deleteAmount.mockResolvedValue(result);
-            const deletedAmount = await financeController.deleteGuest(amountId);
+            const deletedAmount = await financeController.deleteAmount(amountId);
             expect(deletedAmount).toEqual(result);
         });
 
         it('should throw NotFoundException if amount to delete is not found', async () => {
             const amountId = '1';
             (financeService.deleteAmount as jest.Mock).mockResolvedValue(null);
-            await expect(financeController.deleteGuest(amountId)).rejects.toThrow(NotFoundException);
+            await expect(financeController.deleteAmount(amountId)).rejects.toThrow(NotFoundException);
         });
     });
 });
