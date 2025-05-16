@@ -14,7 +14,7 @@ export class FinanceController {
     }
 
     @Get(':id')
-    async getGuestById(@Param('id') id: string) {
+    async getAmountById(@Param('id') id: string) {
         return this.financeService.getAmountById(id);
     }
 
