@@ -25,4 +25,4 @@ COPY --from=build /app/package.json ./package.json
 
 EXPOSE 8081
 
-CMD ["node", "dist/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
