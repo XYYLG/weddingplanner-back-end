@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { GuestController } from "../guest.controller";
 import { GuestService } from "../guest.service";
-import { INestApplication } from "@nestjs/common";
+import { INestApplication, NotFoundException, BadRequestException } from "@nestjs/common";
 import * as request from "supertest";
 import { CreateEditGuestDto } from "../Dto/create-edit-guest.dto";
 
@@ -28,17 +28,20 @@ describe("GuestController (Mock)", () => {
                 ];
                 const guest = mockGuests.find(g => g.id === id);
                 if (guest) return Promise.resolve(guest);
-                return Promise.reject(new Error("Guest not found"));
+                return Promise.reject(new NotFoundException(`Guest with ID ${id} not found`)); // ✅ FIXED
             }),
-            createGuest: jest.fn().mockImplementation((body: CreateEditGuestDto) =>
-                Promise.resolve({ id: "3", ...body })
-            ),
+            createGuest: jest.fn().mockImplementation((body: CreateEditGuestDto) => {
+                if (!body.firstName || !body.lastName) {
+                    return Promise.reject(new BadRequestException("First name and last name are required")); // ✅ FIXED
+                }
+                return Promise.resolve({ id: "3", ...body });
+            }),
             updateGuest: jest.fn().mockImplementation((id: string, body: CreateEditGuestDto) => {
-                if (id !== "1") return Promise.reject(new Error("Guest not found"));
+                if (id !== "1") return Promise.reject(new NotFoundException(`Guest with ID ${id} not found`)); // ✅ FIXED
                 return Promise.resolve({ id, ...body });
             }),
             deleteGuest: jest.fn().mockImplementation((id: string) => {
-                if (id !== "1") return Promise.reject(new Error("Guest not found"));
+                if (id !== "1") return Promise.reject(new NotFoundException(`Guest with ID ${id} not found`)); // ✅ FIXED
                 return Promise.resolve({ success: true });
             }),
         };
@@ -90,6 +93,21 @@ describe("GuestController (Mock)", () => {
 
         expect(response.status).toBe(201);
         expect(response.body).toEqual({ id: "3", ...newGuestDto });
+    });
+
+    it("Moet een 400 Bad Request retourneren bij een gast zonder naam via API", async () => {
+        const invalidGuestDto: CreateEditGuestDto = {
+            firstName: "",
+            lastName: "",
+            phoneNumber: "123456789",
+            address: "Example Street 789",
+        };
+
+        const response = await request(app.getHttpServer())
+            .post("/guest")
+            .send(invalidGuestDto);
+
+        expect(response.status).toBe(400);
     });
 
     it("Moet een bestaande gast updaten via API", async () => {
