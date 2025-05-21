@@ -80,6 +80,7 @@ describe("FinanceController (Mock)", () => {
     it("Moet een 404 Not Found retourneren bij een niet-bestaande ID via API", async () => {
         const response = await request(app.getHttpServer()).get("/finance/999");
         expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Amount with ID 999 not found");
     });
 
     it("Moet een nieuw bedrag aanmaken via API", async () => {
@@ -96,7 +97,7 @@ describe("FinanceController (Mock)", () => {
             .send(newFinanceDto);
 
         expect(response.status).toBe(201);
-        expect(response.body).toHaveProperty("description", "Florist");
+        expect(response.body).toEqual(expect.objectContaining(newFinanceDto));
     });
 
     it("Moet een 400 Bad Request retourneren bij een foutieve invoer via API", async () => {
@@ -129,10 +130,10 @@ describe("FinanceController (Mock)", () => {
             .send(updatedFinanceDto);
 
         expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty("description", "Updated Venue");
+        expect(response.body).toEqual(expect.objectContaining(updatedFinanceDto));
     });
 
-    it("Moet een gast verwijderen via API", async () => {
+    it("Moet een bedrag verwijderen via API", async () => {
         const response = await request(app.getHttpServer()).delete("/finance/1");
         expect(response.status).toBe(200);
         expect(response.body).toEqual({ success: true });

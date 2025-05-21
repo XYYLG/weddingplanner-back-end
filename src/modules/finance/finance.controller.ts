@@ -24,6 +24,9 @@ export class FinanceController {
             }
             return amount;
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new InternalServerErrorException("Error retrieving amount");
         }
     }
@@ -55,29 +58,32 @@ export class FinanceController {
 
     @Put(":id")
     async updateAmount(@Param("id") id: string, @Body() amount: CreateEditFinanceDto) {
-        if (amount.amountPayed == null || amount.amountPayed < 0) {
-            throw new BadRequestException("AmountPayed must be greater than or equal to zero");
-        }
-        if (amount.amountDue == null || amount.amountDue < 0) {
-            throw new BadRequestException("AmountDue must be greater than or equal to zero");
-        }
-        if (amount.amountTotal == null || amount.amountTotal < 0) {
-            throw new BadRequestException("AmountTotal must be greater than or equal to zero");
-        }
-        if (!amount.description || amount.description.trim() === "") {
-            throw new BadRequestException("Description is required");
-        }
-        if (!amount.updatedAt || isNaN(Date.parse(amount.updatedAt.toString()))) {
-            throw new BadRequestException("UpdatedAt must be a valid date");
-        }
-
         try {
-            const updatedAmount = await this.financeService.updateAmount(id, amount);
-            if (!updatedAmount) {
+            const existingAmount = await this.financeService.getAmountById(id);
+            if (!existingAmount) {
                 throw new NotFoundException(`Amount with ID ${id} not found`);
             }
-            return updatedAmount;
+            if (amount.amountPayed == null || amount.amountPayed < 0) {
+                throw new BadRequestException("AmountPayed must be greater than or equal to zero");
+            }
+            if (amount.amountDue == null || amount.amountDue < 0) {
+                throw new BadRequestException("AmountDue must be greater than or equal to zero");
+            }
+            if (amount.amountTotal == null || amount.amountTotal < 0) {
+                throw new BadRequestException("AmountTotal must be greater than or equal to zero");
+            }
+            if (!amount.description || amount.description.trim() === "") {
+                throw new BadRequestException("Description is required");
+            }
+            if (!amount.updatedAt || isNaN(Date.parse(amount.updatedAt.toString()))) {
+                throw new BadRequestException("UpdatedAt must be a valid date");
+            }
+
+            return await this.financeService.updateAmount(id, amount);
         } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw error;
+            }
             throw new InternalServerErrorException("Error updating amount");
         }
     }
@@ -91,6 +97,9 @@ export class FinanceController {
             }
             return deletedAmount;
         } catch (error) {
+            if (error instanceof NotFoundException) { //controleert of een object een instantie is van een bepaalde klasse
+                throw error;
+            }
             throw new InternalServerErrorException("Error deleting amount");
         }
     }
