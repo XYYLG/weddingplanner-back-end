@@ -8,7 +8,7 @@ import { CreateEditFinanceDto } from "../Dto/create-edit-finance.dto";
 describe("FinanceController (Mock)", () => {
     let app: INestApplication;
     let mockFinanceService: {
-        getAmounts: jest.Mock;
+        getAllAmounts: jest.Mock;
         getAmountById: jest.Mock;
         createAmount: jest.Mock;
         updateAmount: jest.Mock;
@@ -17,12 +17,12 @@ describe("FinanceController (Mock)", () => {
 
     beforeAll(async () => {
         mockFinanceService = {
-            getAmounts: jest.fn().mockResolvedValue([
+            getAllAmounts: jest.fn().mockResolvedValue([
                 { id: "1", amountPayed: 500, amountDue: 500, amountTotal: 1000, description: "Venue", updatedAt: new Date().toISOString() },
                 { id: "2", amountPayed: 200, amountDue: 800, amountTotal: 1000, description: "Catering", updatedAt: new Date().toISOString() },
             ]),
             getAmountById: jest.fn().mockImplementation(async (id: string) => {
-                const amounts = await mockFinanceService.getAmounts();
+                const amounts = await mockFinanceService.getAllAmounts();
                 const amount = amounts.find(a => a.id === id);
                 if (amount) return amount;
                 throw new NotFoundException(`Amount with ID ${id} not found`);
