@@ -24,30 +24,27 @@ describe("FinanceController (Mock)", () => {
             getAmountById: jest.fn().mockImplementation(async (id: string) => {
                 const amounts = await mockFinanceService.getAllAmounts();
                 const amount = amounts.find(a => a.id === id);
-                if (amount) return amount;
-                throw new NotFoundException(`Amount with ID ${id} not found`);
+                return amount ? amount : Promise.reject(new NotFoundException(`Amount with ID ${id} not found`));
             }),
             createAmount: jest.fn().mockImplementation((body: CreateEditFinanceDto) => {
-                if (!body.amountPayed || body.amountPayed < 0 || !body.amountDue || body.amountDue < 0 || !body.amountTotal || body.amountTotal < 0) {
-                    throw new BadRequestException("Invalid amount values");
+                if (body.amountPayed < 0 || body.amountDue < 0 || body.amountTotal < 0) {
+                    return Promise.reject(new BadRequestException("Invalid amount values"));
                 }
                 if (!body.description?.trim()) {
-                    throw new BadRequestException("Description is required");
+                    return Promise.reject(new BadRequestException("Description is required"));
                 }
                 if (!body.updatedAt || isNaN(Date.parse(body.updatedAt.toString()))) {
-                    throw new BadRequestException("UpdatedAt must be a valid date");
+                    return Promise.reject(new BadRequestException("UpdatedAt must be a valid date"));
                 }
-                return { id: "3", ...body };
+                return Promise.resolve({ id: "3", ...body, updatedAt: new Date().toISOString() });
             }),
             updateAmount: jest.fn().mockImplementation(async (id: string, body: CreateEditFinanceDto) => {
                 const existingAmount = await mockFinanceService.getAmountById(id);
-                if (!existingAmount) throw new NotFoundException(`Amount with ID ${id} not found`);
-                return { id, ...body };
+                return existingAmount ? Promise.resolve({ id, ...body, updatedAt: new Date().toISOString() }) : Promise.reject(new NotFoundException(`Amount with ID ${id} not found`));
             }),
             deleteAmount: jest.fn().mockImplementation(async (id: string) => {
                 const existingAmount = await mockFinanceService.getAmountById(id);
-                if (!existingAmount) throw new NotFoundException(`Amount with ID ${id} not found`);
-                return { success: true };
+                return existingAmount ? Promise.resolve({ success: true }) : Promise.reject(new NotFoundException(`Amount with ID ${id} not found`));
             }),
         };
 
