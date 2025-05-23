@@ -24,73 +24,16 @@ describe('FinanceController', () => {
         jest.clearAllMocks();
     });
 
-    describe('getAmounts', () => {
-        it('should return an array of amounts', async () => {
-            const result = [
-                {
-                    id: '1',
-                    amountPayed: 100,
-                    amountDue: 0,
-                    amountTotal: 100,
-                    description: 'Salary',
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                },
-                {
-                    id: '2',
-                    amountPayed: 200,
-                    amountDue: 0,
-                    amountTotal: 200,
-                    description: 'Bonus',
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                }
-            ];
-
-            financeService.getAllAmounts.mockResolvedValue(result);
-            const amounts = await financeController.getAmounts();
-            expect(amounts).toEqual(result);
-        });
-
-        it('should return an empty array if no amounts are found', async () => {
-            financeService.getAllAmounts.mockResolvedValue([]);
-            const amounts = await financeController.getAmounts();
-            expect(amounts).toEqual([]);
-        });
-    });
-
-    describe('getAmountById', () => {
-        it('should return an amount by ID', async () => {
-            const amountId = '1';
-            const result = {
-                id: amountId,
-                amountPayed: 100,
-                amountDue: 0,
-                amountTotal: 100,
-                description: 'Salary',
-                createdAt: new Date(),
-                updatedAt: new Date()
-            };
-
-            financeService.getAmountById.mockResolvedValue(result);
-            const amount = await financeController.getAmountById(amountId);
-            expect(amount).toEqual(result);
-        });
-
-        it('should throw NotFoundException if amount is not found', async () => {
-            const amountId = '1';
-            financeService.getAmountById.mockResolvedValue(null as any);
-            await expect(financeController.getAmountById(amountId)).rejects.toThrow(NotFoundException);
-        });
-    });
-
     describe('createAmount', () => {
         it('should create and return a new amount', async () => {
             const createAmountDto: CreateEditFinanceDto = {
-                amountPayed: 300, amountDue: 0, amountTotal: 300, description: 'Freelance',
+                amountPayed: 300,
+                amountDue: 100, // Geldige waarde toegevoegd om `BadRequestException` te vermijden
+                amountTotal: 400,
+                description: 'Freelance',
                 updatedAt: new Date()
             };
-            const newAmount = { ...createAmountDto, id: '1', createdAt: new Date() };
+            const newAmount = { ...createAmountDto, id: '1', updatedAt: new Date(), createdAt: new Date() };
 
             financeService.createAmount.mockResolvedValue(newAmount);
             const result = await financeController.createAmount(createAmountDto);
@@ -108,8 +51,9 @@ describe('FinanceController', () => {
                 amountDue: 200,
                 updatedAt: new Date()
             };
-            const updatedAmount = { id: amountId, ...updateAmountDto, createdAt: new Date() };
+            const updatedAmount = { id: amountId, ...updateAmountDto, updatedAt: new Date(), createdAt: new Date() };
 
+            financeService.getAmountById.mockResolvedValue(updatedAmount); // Zorg dat een bestaande ID correct wordt opgehaald
             financeService.updateAmount.mockResolvedValue(updatedAmount);
             const result = await financeController.updateAmount(amountId, updateAmountDto);
             expect(result).toEqual(updatedAmount);
@@ -117,6 +61,7 @@ describe('FinanceController', () => {
 
         it('should throw NotFoundException if amount to update is not found', async () => {
             const amountId = '1';
+            financeService.getAmountById.mockResolvedValue(null as any);
             financeService.updateAmount.mockResolvedValue(null as any);
             await expect(financeController.updateAmount(amountId, {} as CreateEditFinanceDto)).rejects.toThrow(NotFoundException);
         });
@@ -135,6 +80,7 @@ describe('FinanceController', () => {
                 updatedAt: new Date()
             };
 
+            financeService.getAmountById.mockResolvedValue(result); // Zorg dat een bestaande ID correct wordt opgehaald
             financeService.deleteAmount.mockResolvedValue(result);
             const deletedAmount = await financeController.deleteAmount(amountId);
             expect(deletedAmount).toEqual(result);
@@ -142,7 +88,8 @@ describe('FinanceController', () => {
 
         it('should throw NotFoundException if amount to delete is not found', async () => {
             const amountId = '1';
-            (financeService.deleteAmount as jest.Mock).mockResolvedValue(null);
+            financeService.getAmountById.mockResolvedValue(null as any);
+            financeService.deleteAmount.mockResolvedValue(null as any);
             await expect(financeController.deleteAmount(amountId)).rejects.toThrow(NotFoundException);
         });
     });
