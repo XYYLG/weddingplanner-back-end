@@ -34,11 +34,11 @@ export class FinanceController {
         if (!amount.description || amount.description.trim() === "") {
             throw new BadRequestException("Description is required");
         }
-        if (!amount.updatedAt || isNaN(Date.parse(amount.updatedAt.toString()))) {
-            throw new BadRequestException("UpdatedAt must be a valid date");
-        }
+        amount.updatedAt = new Date();
+
         return this.financeService.createAmount(amount);
     }
+
 
     @Put(":id")
     async updateAmount(@Param("id") id: string, @Body() amount: CreateEditFinanceDto) {
