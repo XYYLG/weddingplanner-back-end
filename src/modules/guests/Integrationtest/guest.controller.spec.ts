@@ -28,26 +28,26 @@ describe("GuestController (Mock)", () => {
                 ];
                 const guest = mockGuests.find(g => g.id === id);
                 if (guest) return Promise.resolve(guest);
-                return Promise.reject(new NotFoundException(`Guest with ID ${id} not found`)); // ✅ FIXED
+                return Promise.reject(new NotFoundException(`Guest with ID ${id} not found`));
             }),
             createGuest: jest.fn().mockImplementation((body: CreateEditGuestDto) => {
                 if (!body.firstName || !body.lastName) {
-                    return Promise.reject(new BadRequestException("First name and last name are required")); // ✅ FIXED
+                    return Promise.reject(new BadRequestException("First name and last name are required"));
                 }
                 return Promise.resolve({ id: "3", ...body });
             }),
             updateGuest: jest.fn().mockImplementation((id: string, body: CreateEditGuestDto) => {
-                if (id !== "1") return Promise.reject(new NotFoundException(`Guest with ID ${id} not found`)); // ✅ FIXED
+                if (id !== "1") return Promise.reject(new NotFoundException(`Guest with ID ${id} not found`));
                 return Promise.resolve({ id, ...body });
             }),
             deleteGuest: jest.fn().mockImplementation((id: string) => {
-                if (id !== "1") return Promise.reject(new NotFoundException(`Guest with ID ${id} not found`)); // ✅ FIXED
+                if (id !== "1") return Promise.reject(new NotFoundException(`Guest with ID ${id} not found`));
                 return Promise.resolve({ success: true });
             }),
         };
 
         const module: TestingModule = await Test.createTestingModule({
-            controllers: [GuestController],
+            controllers: [GuestController], //maakt controller aan
             providers: [{ provide: GuestService, useValue: mockGuestService }],
         }).compile();
 
