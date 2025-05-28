@@ -3,6 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { GuestRepository } from '../guest.repository';
 import { GuestService } from '../guest.service';
 import { CreateEditGuestDto } from '../Dto/create-edit-guest.dto';
+import { Guest } from '@prisma/client';
 
 jest.mock('../guest.repository');
 
@@ -142,5 +143,58 @@ describe('GuestService', () => {
             // Act & Assert
             await expect(guestService.deleteGuest(guestId)).rejects.toThrow(NotFoundException);
         });
+
+        describe('fetchGuests', () => {
+            it('should fetch and return an array of guests from API', async () => {
+                // Arrange
+                const mockGuests: Guest[] = [
+                    { id: '1', firstName: 'John', lastName: 'Doe', phoneNumber: '1234567890', address: '123 Main St', createdAt: new Date(), updatedAt: new Date() },
+                    { id: '2', firstName: 'Jane', lastName: 'Smith', phoneNumber: '0987654321', address: '456 Elm St', createdAt: new Date(), updatedAt: new Date() },
+                ];
+
+                global.fetch = jest.fn(() =>
+                    Promise.resolve({
+                        ok: true,
+                        json: () => Promise.resolve(mockGuests),
+                    })
+                ) as jest.Mock;
+
+                // Act
+                const result = await guestService.fetchGuests();
+
+                // Assert
+                expect(result).toEqual(mockGuests);
+                expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/guests', { mode: 'cors' });
+            });
+
+            it('should return an empty array when API response is not OK', async () => {
+                // Arrange
+                global.fetch = jest.fn(() =>
+                    Promise.resolve({
+                        ok: false,
+                    })
+                ) as jest.Mock;
+
+                // Act
+                const result = await guestService.fetchGuests();
+
+                // Assert
+                expect(result).toEqual([]);
+                expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/guests', { mode: 'cors' });
+            });
+
+            it('should return an empty array when fetch throws an error', async () => {
+                // Arrange
+                global.fetch = jest.fn(() => Promise.reject(new Error('Network error'))) as jest.Mock;
+
+                // Act
+                const result = await guestService.fetchGuests();
+
+                // Assert
+                expect(result).toEqual([]);
+                expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/guests', { mode: 'cors' });
+            });
+        });
     });
-});
+}
+);
