@@ -57,7 +57,8 @@ jobs:
                 -Dsonar.test.inclusions=src/modules/guests/Unittests/**/*.spec.ts \
                 -Dsonar.exclusions=src/modules/guests/**/*.spec.ts \
                 -Dsonar.typescript.lcov.reportPaths=src/coverage/lcov.info \
-    
+                -Dsonar.coverage.exclusions=**/*.spec.ts,**/*.dto.ts,**/*.interface.ts,**/*.module.ts,src/main.ts
+
       # Build de applicatie
       - name: Build the application
         run: npm run build
