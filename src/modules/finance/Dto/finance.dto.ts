@@ -7,6 +7,7 @@ import { IsNotEmpty, IsString, Matches, IsOptional } from "class-validator";
 export class FinanceDto {
 
     @Expose()
+    @IsNotEmpty()
     @IsString()
     @ApiProperty({
         description: 'The amount already payed',
