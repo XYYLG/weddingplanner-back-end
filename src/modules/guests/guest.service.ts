@@ -66,50 +66,34 @@ export class GuestService {
         return newGuest;
 
     }
+
     public async updateGuest(id: string, body: CreateEditGuestDto) {
+
         const guestToUpdate = await this.guestRepository.findById(String(id));
 
         if (!guestToUpdate) {
+
             throw new NotFoundException('Guest not found');
+
         }
 
-        const updatedGuest = await this.guestRepository.update(String(id), body);
+        return await this.guestRepository.update(String(id), body);
 
-        if (this.wss) {
-            const message = JSON.stringify({ success: true, action: "update", guest: updatedGuest });
-
-            this.wss.clients.forEach(client => {
-                if (client.readyState === client.OPEN) {
-                    client.send(message);
-                }
-            });
-        }
-
-        return updatedGuest;
     }
 
     public async deleteGuest(id: string) {
+
         const guestToDelete = await this.guestRepository.findById(String(id));
 
         if (!guestToDelete) {
+
             throw new NotFoundException('Guest not found');
+
         }
 
-        await this.guestRepository.delete(String(id));
+        return await this.guestRepository.delete(String(id));
 
-        if (this.wss) {
-            const message = JSON.stringify({ success: true, action: "delete", guestId: id });
-
-            this.wss.clients.forEach(client => {
-                if (client.readyState === client.OPEN) {
-                    client.send(message);
-                }
-            });
-        }
-
-        return;
     }
-
 
     public async fetchGuests(): Promise<Guest[]> {
 
