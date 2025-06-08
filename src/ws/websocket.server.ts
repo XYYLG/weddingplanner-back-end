@@ -2,27 +2,38 @@ import { WebSocketServer, WebSocket } from "ws";
 import { INestApplicationContext } from "@nestjs/common";
 import { CreateEditGuestDto } from "src/modules/guests/Dto/create-edit-guest.dto";
 import { GuestService } from "src/modules/guests/guest.service";
-
+import { FinanceService } from "src/modules/finance/finance.service"; // Voeg je FinanceService toe
+import { CreateEditFinanceDto } from "src/modules/finance/Dto/create-edit-finance.dto";
 
 let wssGlobal: WebSocketServer;
 
 export function setupWebSocketServer(app: INestApplicationContext) {
     const wss = new WebSocketServer({ port: 8082 });
-    wssGlobal = wss; //  opslaan in globale variabele
+    wssGlobal = wss; // Opslaan in globale variabele
 
     const guestService = app.get(GuestService);
-    guestService.setWebSocketServer(wss); //  doorgeven aan service
+    guestService.setWebSocketServer(wss); // Doorgeven aan service
+
+    const financeService = app.get(FinanceService); // Haal de FinanceService op
+    financeService.setWebSocketServer(wss); // Doorgeven aan service
 
     wss.on('connection', (ws: WebSocket) => {
         console.log('WebSocket client verbonden');
 
         ws.on('message', async (data) => {
             try {
-                const parsed: CreateEditGuestDto = JSON.parse(data.toString());
-                const guest = await guestService.createGuest(parsed);
+                const parsed = JSON.parse(data.toString());
 
-                // Alleen naar deze client
-                ws.send(JSON.stringify({ success: true, guest }));
+                // Controleer het type bericht en handel ernaar
+                if (parsed.type === "guest") {
+                    const guest = await guestService.createGuest(parsed.data);
+                    ws.send(JSON.stringify({ success: true, guest }));
+                } else if (parsed.type === "amount") {
+                    const amount = await financeService.createAmount(parsed.data);
+                    ws.send(JSON.stringify({ success: true, amount }));
+                } else {
+                    ws.send(JSON.stringify({ success: false, error: "Ongeldig berichttype" }));
+                }
             } catch (err) {
                 ws.send(JSON.stringify({ success: false, error: (err as Error).message }));
             }

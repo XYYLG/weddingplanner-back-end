@@ -1,12 +1,19 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Finance, Guest } from "@prisma/client";
+import { Finance } from "@prisma/client";
 import { CreateEditFinanceDto } from "./Dto/create-edit-finance.dto";
 import { FinanceRepository } from "./finance.repository";
+import { WebSocketServer, WebSocket } from "ws"; // WebSocket import toegevoegd
 
 @Injectable()
 export class FinanceService {
 
+    private wss: WebSocketServer | null = null;
+
     constructor(private readonly financeRepository: FinanceRepository) { }
+
+    public setWebSocketServer(wss: WebSocketServer) {
+        this.wss = wss;
+    }
 
     public async getAllAmounts() {
         return await this.financeRepository.findAll();
@@ -24,6 +31,17 @@ export class FinanceService {
 
     public async createAmount(body: CreateEditFinanceDto) {
         const newAmount = await this.financeRepository.create(body);
+
+        if (this.wss) {
+            const message = JSON.stringify({ success: true, finance: newAmount });
+
+            this.wss.clients.forEach(client => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(message);
+                }
+            });
+        }
+
         return newAmount;
     }
 
@@ -59,5 +77,4 @@ export class FinanceService {
             return [];
         }
     }
-
 }
