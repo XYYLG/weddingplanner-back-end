@@ -1,9 +1,8 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { INestApplicationContext } from "@nestjs/common";
-import { CreateEditGuestDto } from "src/modules/guests/Dto/create-edit-guest.dto";
 import { GuestService } from "src/modules/guests/guest.service";
 import { FinanceService } from "src/modules/finance/finance.service"; // Voeg je FinanceService toe
-import { CreateEditFinanceDto } from "src/modules/finance/Dto/create-edit-finance.dto";
+
 
 let wssGlobal: WebSocketServer;
 
