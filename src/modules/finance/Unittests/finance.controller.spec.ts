@@ -28,7 +28,7 @@ describe('FinanceController', () => {
         it('should create and return a new amount', async () => {
             const createAmountDto: CreateEditFinanceDto = {
                 amountPayed: 300,
-                amountDue: 100, // Geldige waarde toegevoegd om `BadRequestException` te vermijden
+                amountDue: 100,
                 amountTotal: 400,
                 description: 'Freelance',
                 updatedAt: new Date()
