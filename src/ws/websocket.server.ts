@@ -3,7 +3,6 @@ import { INestApplicationContext } from "@nestjs/common";
 import { GuestService } from "src/modules/guests/guest.service";
 import { FinanceService } from "src/modules/finance/finance.service"; // Voeg je FinanceService toe
 
-
 let wssGlobal: WebSocketServer;
 
 export function setupWebSocketServer(app: INestApplicationContext) {
