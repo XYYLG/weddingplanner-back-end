@@ -98,26 +98,15 @@ export class GuestService {
     public async fetchGuests(): Promise<Guest[]> {
 
         try {
-
             const response = await fetch('http://localhost:8080/api/guests', { mode: 'cors' });
-
             if (!response.ok) {
-
                 throw new Error("Fout bij het ophalen van gasten");
-
             }
-
             return await response.json();
-
         } catch (error) {
-
             console.error("API fout:", error);
-
             return [];
-
         }
-
     }
-
 }
 

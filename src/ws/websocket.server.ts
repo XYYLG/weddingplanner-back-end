@@ -10,11 +10,10 @@ export function setupWebSocketServer(app: INestApplicationContext) {
     wssGlobal = wss; // Opslaan in globale variabele
 
     const guestService = app.get(GuestService);
-    guestService.setWebSocketServer(wss); // Doorgeven aan service
+    guestService.setWebSocketServer(wss);
 
     const financeService = app.get(FinanceService); // Haal de FinanceService op
-    financeService.setWebSocketServer(wss); // Doorgeven aan service
-
+    financeService.setWebSocketServer(wss);
     wss.on('connection', (ws: WebSocket) => {
         console.log('WebSocket client verbonden');
 
