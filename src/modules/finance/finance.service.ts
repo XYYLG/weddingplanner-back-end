@@ -67,7 +67,6 @@ export class FinanceService {
         const newAmount = await this.financeRepository.create(body);
 
         if (this.wss) {
-            // Voeg amountDue toe aan bericht dat naar clients wordt gestuurd
             const amountDue = newAmount.amountTotal - newAmount.amountPayed;
             const message = JSON.stringify({ success: true, finance: { ...newAmount, amountDue } });
 
@@ -119,4 +118,24 @@ export class FinanceService {
             return [];
         }
     }
+
+    public async getFinanceTotals() {
+        const finances = await this.financeRepository.findAll();
+
+        if (!finances || finances.length === 0) {
+            throw new NotFoundException("No finance records found");
+        }
+
+        // Bereken totalen
+        const totalPayed = finances.reduce((sum, f) => sum + f.amountPayed, 0);
+        const totalTotal = finances.reduce((sum, f) => sum + f.amountTotal, 0);
+        const totalDue = finances.reduce((sum, f) => sum + (f.amountTotal - f.amountPayed), 0);
+
+        return {
+            totalPayed,
+            totalTotal,
+            totalDue,
+        };
+    }
+
 }

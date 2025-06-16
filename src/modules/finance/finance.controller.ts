@@ -8,7 +8,12 @@ export class FinanceController {
 
     @Get()
     async getAmounts() {
-        return this.financeService.getAllAmounts();
+        const amounts = await this.financeService.getAllAmounts();
+
+        if (!amounts || amounts.length === 0) {
+            throw new NotFoundException("Geen finance records gevonden");
+        }
+        return amounts;
     }
 
     @Get(":id")
@@ -19,6 +24,26 @@ export class FinanceController {
         }
         return amount;
     }
+
+    @Get('totals')
+    async getTotals() {
+        const totals = await this.financeService.getFinanceTotals();
+
+        if (!totals) {
+            throw new NotFoundException('Geen totale bedragen gevonden');
+        }
+
+        if (
+            totals.totalPayed < 0 ||
+            totals.totalTotal < 0 ||
+            totals.totalDue < 0
+        ) {
+            throw new BadRequestException('Totale bedragen mogen niet negatief zijn');
+        }
+
+        return totals;
+    }
+
 
     @Post()
     async createAmount(@Body() amount: CreateEditFinanceDto) {
