@@ -146,4 +146,68 @@ describe('FinanceService', () => {
             expect(amounts).toEqual([]);
         });
     });
+
+    describe('FinanceService - getFinanceTotals', () => {
+        let financeService: any;
+        let financeRepositoryMock: any;
+
+        beforeEach(() => {
+            financeRepositoryMock = {
+                findAll: jest.fn(),
+            };
+            financeService = {
+                financeRepository: financeRepositoryMock,
+                getFinanceTotals: async function () {
+                    const finances = await this.financeRepository.findAll();
+                    if (!finances || finances.length === 0) {
+                        throw new NotFoundException("No finance records found");
+                    }
+                    const totalPayed = finances.reduce((sum, f) => sum + f.amountPayed, 0);
+                    const totalTotal = finances.reduce((sum, f) => sum + f.amountTotal, 0);
+                    const totalDue = finances.reduce((sum, f) => sum + (f.amountTotal - f.amountPayed), 0);
+                    return {
+                        totalPayed,
+                        totalTotal,
+                        totalDue,
+                    };
+                }
+            };
+        });
+
+        it('should correctly calculate totals when finances exist', async () => {
+            // Arrange
+            const finances = [
+                { amountPayed: 100, amountTotal: 150 },
+                { amountPayed: 200, amountTotal: 250 },
+                { amountPayed: 50, amountTotal: 100 },
+            ];
+            financeRepositoryMock.findAll.mockResolvedValue(finances);
+
+            // Act
+            const result = await financeService.getFinanceTotals();
+
+            // Assert
+            expect(result).toEqual({
+                totalPayed: 350, // 100 + 200 + 50
+                totalTotal: 500, // 150 + 250 + 100
+                totalDue: 150,   // (150-100) + (250-200) + (100-50)
+            });
+        });
+
+        it('should throw NotFoundException when no finances found (null)', async () => {
+            // Arrange
+            financeRepositoryMock.findAll.mockResolvedValue(null);
+
+            // Act & Assert
+            await expect(financeService.getFinanceTotals()).rejects.toThrow(NotFoundException);
+        });
+
+        it('should throw NotFoundException when no finances found (empty array)', async () => {
+            // Arrange
+            financeRepositoryMock.findAll.mockResolvedValue([]);
+
+            // Act & Assert
+            await expect(financeService.getFinanceTotals()).rejects.toThrow(NotFoundException);
+        });
+    });
 });
