@@ -8,7 +8,12 @@ export class FinanceController {
 
     @Get()
     async getAmounts() {
-        return this.financeService.getAllAmounts();
+        const amounts = await this.financeService.getAllAmounts();
+
+        if (!amounts || amounts.length === 0) {
+            throw new NotFoundException("Geen finance records gevonden");
+        }
+        return amounts;
     }
 
     @Get(":id")
@@ -20,24 +25,46 @@ export class FinanceController {
         return amount;
     }
 
+    @Get('totals')
+    async getTotals() {
+        const totals = await this.financeService.getFinanceTotals();
+
+        if (!totals) {
+            throw new NotFoundException('Geen totale bedragen gevonden');
+        }
+
+        if (
+            totals.totalPayed < 0 ||
+            totals.totalTotal < 0 ||
+            totals.totalDue < 0
+        ) {
+            throw new BadRequestException('Totale bedragen mogen niet negatief zijn');
+        }
+
+        return totals;
+    }
+
+
     @Post()
     async createAmount(@Body() amount: CreateEditFinanceDto) {
-        if (!amount.amountPayed || amount.amountPayed < 0) {
+        if (amount.amountPayed < 0) {
             throw new BadRequestException("AmountPayed must be greater than or equal to zero");
         }
-        if (!amount.amountDue || amount.amountDue < 0) {
-            throw new BadRequestException("AmountDue must be greater than or equal to zero");
-        }
-        if (!amount.amountTotal || amount.amountTotal < 0) {
+        if (amount.amountTotal < 0) {
             throw new BadRequestException("AmountTotal must be greater than or equal to zero");
+        }
+        if (amount.amountPayed > amount.amountTotal) {
+            throw new BadRequestException("AmountPayed cannot be greater than AmountTotal");
         }
         if (!amount.description || amount.description.trim() === "") {
             throw new BadRequestException("Description is required");
         }
+
         amount.updatedAt = new Date();
 
         return this.financeService.createAmount(amount);
     }
+
 
 
     @Put(":id")

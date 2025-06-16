@@ -28,7 +28,6 @@ describe('FinanceController', () => {
         it('should create and return a new amount', async () => {
             const createAmountDto: CreateEditFinanceDto = {
                 amountPayed: 300,
-                amountDue: 100,
                 amountTotal: 400,
                 description: 'Freelance',
                 updatedAt: new Date()
@@ -48,24 +47,36 @@ describe('FinanceController', () => {
                 amountTotal: 400,
                 description: 'Updated',
                 amountPayed: 200,
-                amountDue: 200,
-                updatedAt: new Date()
+                updatedAt: new Date(),
             };
-            const updatedAmount = { id: amountId, ...updateAmountDto, updatedAt: new Date(), createdAt: new Date() };
 
-            financeService.getAmountById.mockResolvedValue(updatedAmount); // Zorg dat een bestaande ID correct wordt opgehaald
-            financeService.updateAmount.mockResolvedValue(updatedAmount);
+            // amountDue berekenen als in je service
+            const amountDue = updateAmountDto.amountTotal - updateAmountDto.amountPayed;
+
+            const updatedAmount = {
+                id: amountId,
+                ...updateAmountDto,
+                amountDue,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+
+            financeService.getAmountById.mockResolvedValue(updatedAmount); // Mock bestaande amount
+            financeService.updateAmount.mockResolvedValue(updatedAmount);  // Mock update result
+
             const result = await financeController.updateAmount(amountId, updateAmountDto);
+
             expect(result).toEqual(updatedAmount);
         });
 
         it('should throw NotFoundException if amount to update is not found', async () => {
             const amountId = '1';
-            financeService.getAmountById.mockResolvedValue(null as any);
+            financeService.getAmountById.mockResolvedValue(null as any); // Mock dat de amount niet gevonden wordt
             financeService.updateAmount.mockResolvedValue(null as any);
             await expect(financeController.updateAmount(amountId, {} as CreateEditFinanceDto)).rejects.toThrow(NotFoundException);
         });
     });
+
 
     describe('deleteAmount', () => {
         it('should delete and return the deleted amount', async () => {

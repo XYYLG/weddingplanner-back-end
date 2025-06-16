@@ -20,7 +20,6 @@ model Guest {
 model Finance {
     id          String   @id @default(uuid())
     amountPayed Float
-    amountDue   Float
     amountTotal Float
     description String
     createdAt   DateTime @default(now())
