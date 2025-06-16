@@ -126,7 +126,6 @@ export class FinanceService {
             throw new NotFoundException("No finance records found");
         }
 
-        // Bereken totalen
         const totalPayed = finances.reduce((sum, f) => sum + f.amountPayed, 0);
         const totalTotal = finances.reduce((sum, f) => sum + f.amountTotal, 0);
         const totalDue = finances.reduce((sum, f) => sum + (f.amountTotal - f.amountPayed), 0);
