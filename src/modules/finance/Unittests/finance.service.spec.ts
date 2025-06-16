@@ -5,7 +5,18 @@ import { CreateEditFinanceDto } from '../Dto/create-edit-finance.dto';
 import { NotFoundException } from '@nestjs/common';
 import { Finance } from '@prisma/client';
 
-jest.mock('../finance.repository');
+jest.mock('../finance.repository', () => {
+    return {
+        FinanceRepository: jest.fn().mockImplementation(() => ({
+            findAll: jest.fn(),
+            findById: jest.fn(),
+            create: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+            getTotals: jest.fn(), // Add getTotals to the mock
+        })),
+    };
+});
 
 describe('FinanceService', () => {
     let financeService: FinanceService;
@@ -147,67 +158,35 @@ describe('FinanceService', () => {
         });
     });
 
-    describe('FinanceService - getFinanceTotals', () => {
-        let financeService: any;
-        let financeRepositoryMock: any;
-
-        beforeEach(() => {
-            financeRepositoryMock = {
-                findAll: jest.fn(),
-            };
-            financeService = {
-                financeRepository: financeRepositoryMock,
-                getFinanceTotals: async function () {
-                    const finances = await this.financeRepository.findAll();
-                    if (!finances || finances.length === 0) {
-                        throw new NotFoundException("No finance records found");
-                    }
-                    const totalPayed = finances.reduce((sum, f) => sum + f.amountPayed, 0);
-                    const totalTotal = finances.reduce((sum, f) => sum + f.amountTotal, 0);
-                    const totalDue = finances.reduce((sum, f) => sum + (f.amountTotal - f.amountPayed), 0);
-                    return {
-                        totalPayed,
-                        totalTotal,
-                        totalDue,
-                    };
-                }
-            };
-        });
-
-        it('should correctly calculate totals when finances exist', async () => {
+    describe('getFinanceTotals', () => {
+        it('should return correct totalPayed, totalTotal and totalDue', async () => {
             // Arrange
-            const finances = [
-                { amountPayed: 100, amountTotal: 150 },
-                { amountPayed: 200, amountTotal: 250 },
-                { amountPayed: 50, amountTotal: 100 },
+            const finances: Finance[] = [
+                { id: '1', amountTotal: 1000, amountPayed: 600, description: 'Factuur 1', createdAt: new Date(), updatedAt: new Date() },
+                { id: '2', amountTotal: 2000, amountPayed: 500, description: 'Factuur 2', createdAt: new Date(), updatedAt: new Date() },
+                { id: '3', amountTotal: 1500, amountPayed: 1500, description: 'Factuur 3', createdAt: new Date(), updatedAt: new Date() },
             ];
-            financeRepositoryMock.findAll.mockResolvedValue(finances);
+            financeRepository.findAll.mockResolvedValue(finances);
 
             // Act
             const result = await financeService.getFinanceTotals();
 
             // Assert
             expect(result).toEqual({
-                totalPayed: 350, // 100 + 200 + 50
-                totalTotal: 500, // 150 + 250 + 100
-                totalDue: 150,   // (150-100) + (250-200) + (100-50)
+                totalPayed: 600 + 500 + 1500,   // 2600
+                totalTotal: 1000 + 2000 + 1500, // 4500
+                totalDue: (1000 - 600) + (2000 - 500) + (1500 - 1500), // 400 + 1500 + 0 = 1900
             });
         });
 
-        it('should throw NotFoundException when no finances found (null)', async () => {
+        it('should throw NotFoundException if no finance records exist', async () => {
             // Arrange
-            financeRepositoryMock.findAll.mockResolvedValue(null);
-
-            // Act & Assert
-            await expect(financeService.getFinanceTotals()).rejects.toThrow(NotFoundException);
-        });
-
-        it('should throw NotFoundException when no finances found (empty array)', async () => {
-            // Arrange
-            financeRepositoryMock.findAll.mockResolvedValue([]);
+            financeRepository.findAll.mockResolvedValue([]);
 
             // Act & Assert
             await expect(financeService.getFinanceTotals()).rejects.toThrow(NotFoundException);
         });
     });
+
+
 });
