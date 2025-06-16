@@ -22,22 +22,24 @@ export class FinanceController {
 
     @Post()
     async createAmount(@Body() amount: CreateEditFinanceDto) {
-        if (!amount.amountPayed || amount.amountPayed < 0) {
+        if (amount.amountPayed < 0) {
             throw new BadRequestException("AmountPayed must be greater than or equal to zero");
         }
-        if (!amount.amountDue || amount.amountDue < 0) {
-            throw new BadRequestException("AmountDue must be greater than or equal to zero");
-        }
-        if (!amount.amountTotal || amount.amountTotal < 0) {
+        if (amount.amountTotal < 0) {
             throw new BadRequestException("AmountTotal must be greater than or equal to zero");
+        }
+        if (amount.amountPayed > amount.amountTotal) {
+            throw new BadRequestException("AmountPayed cannot be greater than AmountTotal");
         }
         if (!amount.description || amount.description.trim() === "") {
             throw new BadRequestException("Description is required");
         }
+
         amount.updatedAt = new Date();
 
         return this.financeService.createAmount(amount);
     }
+
 
 
     @Put(":id")

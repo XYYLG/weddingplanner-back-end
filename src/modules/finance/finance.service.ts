@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { Finance } from "@prisma/client";
 import { CreateEditFinanceDto } from "./Dto/create-edit-finance.dto";
 import { FinanceRepository } from "./finance.repository";
-import { WebSocketServer, WebSocket } from "ws"; // WebSocket import toegevoegd
+import { WebSocketServer, WebSocket } from "ws";
 
 @Injectable()
 export class FinanceService {
@@ -16,24 +16,60 @@ export class FinanceService {
     }
 
     public async getAllAmounts() {
-        return await this.financeRepository.findAll();
+        const finances = await this.financeRepository.findAll();
+
+        if (!finances || finances.length === 0) {
+            throw new NotFoundException("No finance records found");
+        }
+
+        return finances.map(f => {
+            const amountDue = f.amountTotal - f.amountPayed;
+
+            if (amountDue < 0) {
+                throw new BadRequestException(
+                    `Invalid finance record (ID: ${f.id}): amountDue cannot be negative (amountTotal: ${f.amountTotal}, amountPayed: ${f.amountPayed})`
+                );
+            }
+
+            return {
+                ...f,
+                amountDue
+            };
+        });
     }
 
     public async getAmountById(id: string) {
-        const amount = await this.financeRepository.findById(String(id));
+        const amount = await this.financeRepository.findById(id);
 
         if (!amount) {
             throw new NotFoundException('Amount not found');
         }
 
-        return amount;
+        const amountDue = amount.amountTotal - amount.amountPayed;
+
+        if (amountDue < 0) {
+            throw new BadRequestException(
+                `Invalid finance record (ID: ${id}): amountDue cannot be negative (amountTotal: ${amount.amountTotal}, amountPayed: ${amount.amountPayed})`
+            );
+        }
+
+        return {
+            ...amount,
+            amountDue
+        };
     }
 
     public async createAmount(body: CreateEditFinanceDto) {
+        if (body.amountTotal < body.amountPayed) {
+            throw new BadRequestException('amountTotal mag niet kleiner zijn dan amountPayed');
+        }
+
         const newAmount = await this.financeRepository.create(body);
 
         if (this.wss) {
-            const message = JSON.stringify({ success: true, finance: newAmount });
+            // Voeg amountDue toe aan bericht dat naar clients wordt gestuurd
+            const amountDue = newAmount.amountTotal - newAmount.amountPayed;
+            const message = JSON.stringify({ success: true, finance: { ...newAmount, amountDue } });
 
             this.wss.clients.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
@@ -46,23 +82,29 @@ export class FinanceService {
     }
 
     public async updateAmount(id: string, body: CreateEditFinanceDto) {
-        const amountToUpdate = await this.financeRepository.findById(String(id));
+        const amountToUpdate = await this.financeRepository.findById(id);
 
         if (!amountToUpdate) {
             throw new NotFoundException('Amount not found');
         }
 
-        return await this.financeRepository.update(String(id), body);
+        if (body.amountTotal < body.amountPayed) {
+            throw new BadRequestException('amountTotal mag niet kleiner zijn dan amountPayed');
+        }
+
+        const updatedAmount = await this.financeRepository.update(id, body);
+
+        return updatedAmount;
     }
 
     public async deleteAmount(id: string) {
-        const amountToDelete = await this.financeRepository.findById(String(id));
+        const amountToDelete = await this.financeRepository.findById(id);
 
         if (!amountToDelete) {
             throw new NotFoundException('Amount not found');
         }
 
-        return await this.financeRepository.delete(String(id));
+        return await this.financeRepository.delete(id);
     }
 
     public async fetchAmounts(): Promise<Finance[]> {
