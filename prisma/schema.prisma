@@ -24,4 +24,6 @@ model Finance {
     description String
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
+
+    @@map("Finance") // Zorgt dat Prisma "Finance" gebruikt, met quotes
 }
